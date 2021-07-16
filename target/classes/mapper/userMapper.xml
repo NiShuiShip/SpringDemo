@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="user"> <!-- 注意，因为这边没有用到mapper接口，所以这里的namespace不需要是完全的类名 -->
+
+    <!-- 通过id查询用户 -->
+    <select id="findUserById" parameterType="java.lang.String" resultType="com.zxy.interceptor.User">
+        select * from user where id like '%${value}%'
+    </select>
+    <!--通过name查找一个list的用户，模糊匹配-->
+    <select id="findUserByName" parameterType="java.lang.String" resultType="com.zxy.interceptor.User">
+        select * from user where name like '%${value}%'
+    </select>
+
+    <!--插入用户信息-->
+    <insert id="insertUser" parameterType="com.zxy.interceptor.User">
+        <selectKey keyProperty="id" order="BEFORE" resultType="java.lang.String">
+            select uuid()
+            <!--            这里是对于主键属性的id进行赋值 -->
+        </selectKey>
+        insert into user(id,username,password) values(#{id},#{username},#{password})
+    </insert>
+    <!--删除用户信息-->
+    <delete id="deleteUser" parameterType="java.lang.Integer">
+        delete from user where id=#{id}
+    </delete>
+    <!--更新用户信息-->
+    <update id="updateUser" parameterType="com.zxy.interceptor.User">
+        <!-- update user set name=#{name},password=#{password} where id=#{id} -->
+        update user
+        <set>
+            <if test="username != null and username != ''">username=#{username},</if>
+            <if test="password != null and password != ''">password=#{password},</if>
+        </set>
+        where id= #{id}
+    </update>
+</mapper>
